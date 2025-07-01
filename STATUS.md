@@ -1,11 +1,11 @@
 # CHPP Authentication
 
-| Flow            | Description | Status             |
-| --------------- | ----------- | ------------------ |
-| Request Token   | -           | ❌ Not Implemented |
-| Access Token    | -           | ❌ Not Implemented |
-| Check Token     | -           | ❌ Not Implemented |
-| Ivalidate Token | -           | ❌ Not Implemented |
+| Flow             | Description | Status             | API             |
+| ---------------- | ----------- | ------------------ | --------------- |
+| Request Token    | -           | ✅​ Done            | getRequestToken |
+| Access Token     | -           | ✅​ Done            | getAccessToken  |
+| Check Token      | -           | ✅​ Done            | checkToken      |
+| Invalidate Token | -           | ✅​ Done            | invalidateToken |
 
 # CHPP Files
 
