@@ -1,0 +1,24 @@
+{
+  "name": "hattrick-api-client",
+  "version": "1.0.0-alpha.0",
+  "description": "",
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "start": "tsx .",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.2.5",
+    "oauth": "^0.10.2"
+  },
+  "devDependencies": {
+    "@types/oauth": "^0.9.6",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
