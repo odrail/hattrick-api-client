@@ -8,6 +8,8 @@ import OAuthAccessTokenResponse from "./models/oauth/OAuthAccessTokenResponse";
 import IHattrickApiClient from "./interfaces/IHattrickApiClient";
 import OAuthAccessTokenRequest from "./models/oauth/OAuthAccessTokenRequest";
 import HattrickApiClientConfig from "./interfaces/HattrickApiClientConfig";
+import { defaultVersion, RegionDetailsConfig, RegionDetailsInput, RegionDetailsOutput } from "./models/regionDetails/RegionDetails_1.2";
+import ErrorResponse from "./models/ErrorResponse";
 
 export default class HattrickApiClient implements IHattrickApiClient {
   private oauth: OAuth;
@@ -21,6 +23,7 @@ export default class HattrickApiClient implements IHattrickApiClient {
   private static readonly accessTokenPath = "https://chpp.hattrick.org/oauth/access_token.ashx"
   private static readonly checkTokenPath = "https://chpp.hattrick.org/oauth/check_token.ashx"
   private static readonly invalidateTokenPath = "https://chpp.hattrick.org/oauth/invalidate_token.ashx"
+  private static readonly protectedPath = "https://chpp.hattrick.org/chppxml.ashx"
   private readonly parser = new XMLParser({ ignoreDeclaration: true, numberParseOptions: { hex: false, leadingZeros: false, skipLike: new RegExp(/\d+.\d+/) } });
 
   constructor(config: HattrickApiClientConfig) {
@@ -75,8 +78,7 @@ export default class HattrickApiClient implements IHattrickApiClient {
     })
   }
   async checkToken(): Promise<OAuthCheckTokenResponse> {
-    const data = await this.callAuthenticatedAPI(HattrickApiClient.checkTokenPath);
-    const parsedData = this.parser.parse(data as string) as OAuthCheckTokenResponseRaw;
+    const parsedData = await this.callAuthenticatedAPI<OAuthCheckTokenResponseRaw>(HattrickApiClient.checkTokenPath);
     console.log("Parsed Data:", parsedData);
     return {
       HattrickData: {
@@ -95,10 +97,21 @@ export default class HattrickApiClient implements IHattrickApiClient {
     if (!this.oauth_access_token || !this.oauth_access_token_secret) {
       return Promise.reject(new Error("OAuth access token and secret are required to check the token."));
     }
-    return this.callAuthenticatedAPI(HattrickApiClient.invalidateTokenPath)
+    return this.callAuthenticatedAPI<string>(HattrickApiClient.invalidateTokenPath)
   }
 
-  private callAuthenticatedAPI(url: string): Promise<string> {
+  async getRegionDetails(config?: RegionDetailsConfig): Promise<RegionDetailsOutput> {
+    const input : RegionDetailsInput = {
+      file: "regiondetails",
+      version: config?.version || defaultVersion,
+      regionID: config?.regionID,
+    }
+
+    const response = await this.callAuthenticatedAPI<RegionDetailsOutput>(`${HattrickApiClient.protectedPath}?${new URLSearchParams(input as any).toString()}`);
+    return response
+  }
+
+  private callAuthenticatedAPI<T>(url: string): Promise<T> {
     if (!this.oauth_access_token || !this.oauth_access_token_secret) {
       return Promise.reject(new Error("OAuth access token and secret are required to check the token."));
     }
@@ -111,7 +124,12 @@ export default class HattrickApiClient implements IHattrickApiClient {
           if (err) {
             return reject(err);
           }
-          return resolve(data as string);
+          const parsedData = this.parser.parse(data as string);
+
+          if ((parsedData as ErrorResponse).HattrickData.Error) {
+            return reject((parsedData as ErrorResponse));
+          }
+          return resolve(parsedData as T);
         }
       );
     });

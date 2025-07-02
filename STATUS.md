@@ -797,10 +797,10 @@
         <td>❌ Not Implemented</td>
     </tr>
     <tr>
-        <td>regiondetails</td>
+        <td><a href="https://www84.hattrick.org/Community/CHPP/NewDocs/File.aspx?name=regiondetails">regiondetails</a></td>
         <td>Detailed information about a region</td>
         <td>1.2 {default}</td>
-        <td>❌ Not Implemented</td>
+        <td>✅​ Done</td>
     </tr>
     <tr>
         <td>search</td>
