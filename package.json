@@ -5,11 +5,11 @@
   "license": "MIT",
   "author": "",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "tsx .",
-    "build": "tsc",
+    "build": "rimraf dist && rollup --config",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -17,7 +17,12 @@
     "oauth": "^0.10.2"
   },
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.4",
     "@types/oauth": "^0.9.6",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.44.1",
+    "tslib": "^2.8.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
