@@ -1,5 +1,4 @@
 import { WeatherID } from "../dataTypes/WeatherId";
-import HattrickDataContainer from "../HattrickDataModel";
 
 type Version = "1.2";
 
@@ -30,5 +29,5 @@ type RegionDatilsDataOutput_1_2 = {
   }
 }
 
-export type RegionDetailsOutput_1_2 = HattrickDataContainer<RegionDatilsDataOutput_1_2>;
+export type RegionDetailsOutput_1_2 = RegionDatilsDataOutput_1_2;
 export type RegionDetailsOutput = RegionDetailsOutput_1_2;

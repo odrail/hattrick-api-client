@@ -10,6 +10,7 @@ import OAuthAccessTokenRequest from "./models/oauth/OAuthAccessTokenRequest";
 import HattrickApiClientConfig from "./interfaces/HattrickApiClientConfig";
 import { defaultVersion, RegionDetailsConfig, RegionDetailsInput, RegionDetailsOutput } from "./models/regionDetails/RegionDetails_1.2";
 import ErrorResponse from "./models/ErrorResponse";
+import HattrickDataContainer from "./models/HattrickDataModel";
 
 export default class HattrickApiClient implements IHattrickApiClient {
   private oauth: OAuth;
@@ -77,30 +78,20 @@ export default class HattrickApiClient implements IHattrickApiClient {
       );
     })
   }
-  async checkToken(): Promise<OAuthCheckTokenResponse> {
-    const parsedData = await this.callAuthenticatedAPI<OAuthCheckTokenResponseRaw>(HattrickApiClient.checkTokenPath);
+  async checkToken(): Promise<HattrickDataContainer<OAuthCheckTokenResponse>> {
+    const parsedData = await this.callAuthenticatedAPI<OAuthCheckTokenResponse>(HattrickApiClient.checkTokenPath);
     console.log("Parsed Data:", parsedData);
-    return {
-      HattrickData: {
-        ...parsedData.HattrickData,
-        UserID: parseInt(parsedData.HattrickData.UserID, 10),
-        User: parseInt(parsedData.HattrickData.User, 10),
-        FetchedDate: new Date(parsedData.HattrickData.FetchedDate),
-        Created: new Date(parsedData.HattrickData.Created),
-        Expires: new Date(parsedData.HattrickData.Expires),
-        ExtendedPermissions: parsedData.HattrickData.ExtendedPermissions != "" ? parsedData.HattrickData.ExtendedPermissions.split(',').map((scope: string) => scope.trim() as Scope) : [],
-      }
-    };
+    return parsedData
   }
 
-  invalidateToken(): Promise<string> {
+  async invalidateToken(): Promise<void> {
     if (!this.oauth_access_token || !this.oauth_access_token_secret) {
       return Promise.reject(new Error("OAuth access token and secret are required to check the token."));
     }
-    return this.callAuthenticatedAPI<string>(HattrickApiClient.invalidateTokenPath)
+    await this.callAuthenticatedAPI<unknown>(HattrickApiClient.invalidateTokenPath)
   }
 
-  async getRegionDetails(config?: RegionDetailsConfig): Promise<RegionDetailsOutput> {
+  async getRegionDetails(config?: RegionDetailsConfig): Promise<HattrickDataContainer<RegionDetailsOutput>> {
     const input : RegionDetailsInput = {
       file: "regiondetails",
       version: config?.version || defaultVersion,
@@ -111,7 +102,7 @@ export default class HattrickApiClient implements IHattrickApiClient {
     return response
   }
 
-  private callAuthenticatedAPI<T>(url: string): Promise<T> {
+  private callAuthenticatedAPI<T>(url: string): Promise<HattrickDataContainer<T>> {
     if (!this.oauth_access_token || !this.oauth_access_token_secret) {
       return Promise.reject(new Error("OAuth access token and secret are required to check the token."));
     }
@@ -129,7 +120,16 @@ export default class HattrickApiClient implements IHattrickApiClient {
           if ((parsedData as ErrorResponse).HattrickData.Error) {
             return reject((parsedData as ErrorResponse));
           }
-          return resolve(parsedData as T);
+          const _parsedData: HattrickDataContainer<T> = {
+            HattrickData: {
+              ...parsedData.HattrickData,
+              FileName: parsedData.HattrickData.FileName as string,
+              Version: parsedData.HattrickData.Version as string,
+              UserID: parseInt(parsedData.HattrickData.UserID as string, 10),
+              FetchedDate: new Date(parsedData.HattrickData.FetchedDate as string)
+            }
+          }
+          return resolve(_parsedData);
         }
       );
     });

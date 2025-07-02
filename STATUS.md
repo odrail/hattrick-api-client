@@ -15,6 +15,7 @@
         <td>Description</td>
         <td>Versions</td>
         <td>Status</td>
+        <td>API</td>
     </tr>
     <tr>
         <td rowspan="3">achievements</td>
@@ -801,6 +802,7 @@
         <td>Detailed information about a region</td>
         <td>1.2 {default}</td>
         <td>✅​ Done</td>
+        <td>getRegionDetails()></td>
     </tr>
     <tr>
         <td>search</td>
