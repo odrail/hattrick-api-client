@@ -1,75 +1,13 @@
 import { OAuth } from "oauth";
 import { XMLParser } from "fast-xml-parser";
-
-export enum Scope {
-
-  MANAGE_CHALLENGES = "manage_challenges",
-  SET_MATCH_ORDER = "set_matchorder",
-  MANAGE_YOUTH_PLAYERS = "manage_youthplayers",
-  SET_TRAINING = "set_training",
-  PLACE_BID = "place_bid",
-}
-
-interface HattrickApiClientConfig {
-  oauth_consumer_key: string;
-  oauth_consumer_secret: string;
-  oauth_access_token?: string;
-  oauth_access_token_secret?: string;
-  oauth_callback?: string; // Optional callback URL, default is "oob"
-}
-
-interface OAuthAccessTokenResponse {
-  oauth_access_token: string;
-  oauth_access_token_secret: string;
-}
-
-interface OAuthRequestTokenResponse {
-  oauth_token: string;
-  oauth_token_secret: string;
-  oauth_authorize_url: string;
-}
-
-interface OAuthAccessTokenRequest {
-  oauth_token: string;
-  oauth_token_secret: string;
-  oauth_verifier: string
-}
-
-interface OAuthCheckTokenResponseRaw {
-  HattrickData: {
-    FileName: string, //>check_token</FileName>
-    Version: string, //>1.0</Version>
-    UserID: string, //>14262221</UserID>
-    FetchedDate: string, //>2025-07-01 13:06:39</FetchedDate>
-    Token: string, //>4E7lEYyIhCPSninp</Token>
-    Created: string, //>2025-06-27 17:53:00</Created>
-    User: string, //>14262221</User>
-    Expires: string, //>9999-12-31 23:59:59</Expires>
-    ExtendedPermissions: string, //>manage_challenges,set_matchorder,manage_youthplayers,set_training,place_bid</ExtendedPermissions>
-  }
-}
-
-interface OAuthCheckTokenResponse {
-  HattrickData: {
-    FileName: string, //>check_token</FileName>
-    Version: string, //>1.0</Version>
-    UserID: number, //>14262221</UserID>
-    FetchedDate: Date, //>2025-07-01 13:06:39</FetchedDate>
-    Token: string, //>4E7lEYyIhCPSninp</Token>
-    Created: Date, //>2025-06-27 17:53:00</Created>
-    User: number, //>14262221</User>
-    Expires: Date, //>9999-12-31 23:59:59</Expires>
-    ExtendedPermissions: Scope[], //>manage_challenges,set_matchorder,manage_youthplayers,set_training,place_bid</ExtendedPermissions>
-  }
-}
-
-interface IHattrickApiClient {
-  getRequestToken(): Promise<OAuthRequestTokenResponse>;
-  getAccessToken(config: OAuthAccessTokenRequest): Promise<OAuthAccessTokenResponse>;
-  checkToken(): Promise<OAuthCheckTokenResponse>;
-  invalidateToken(): Promise<string>;
-}
-
+import OAuthCheckTokenResponse from "./models/oauth/OAuthCheckTokenResponse";
+import OAuthCheckTokenResponseRaw from "./models/oauth/OAuthCheckTokenResponseRaw";
+import { Scope } from "./models/oauth/Scope";
+import OAuthRequestTokenResponse from "./models/oauth/OAuthRequestTokenResponse";
+import OAuthAccessTokenResponse from "./models/oauth/OAuthAccessTokenResponse";
+import IHattrickApiClient from "./interfaces/IHattrickApiClient";
+import OAuthAccessTokenRequest from "./models/oauth/OAuthAccessTokenRequest";
+import HattrickApiClientConfig from "./interfaces/HattrickApiClientConfig";
 
 export default class HattrickApiClient implements IHattrickApiClient {
   private oauth: OAuth;
