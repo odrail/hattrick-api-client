@@ -3,7 +3,9 @@
   "version": "1.0.0-alpha.0",
   "description": "",
   "license": "MIT",
-  "author": "",
+  "author": {
+    "name": "odrail"
+  },
   "type": "module",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
@@ -12,6 +14,10 @@
     "build": "rimraf dist && rollup --config",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/odrail/hattrick-api-client",
   "dependencies": {
     "fast-xml-parser": "^5.2.5",
     "oauth": "^0.10.2"
