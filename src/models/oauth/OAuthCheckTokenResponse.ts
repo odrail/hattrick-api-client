@@ -9,6 +9,6 @@ type OAuthCheckTokenData = {
     ExtendedPermissions: Scope[], //>manage_challenges,set_matchorder,manage_youthplayers,set_training,place_bid</ExtendedPermissions>
 }
 
-type OAuthCheckTokenResponse = HattrickDataContainer<OAuthCheckTokenData>;
+type OAuthCheckTokenResponse = OAuthCheckTokenData;
 
 export default OAuthCheckTokenResponse;
