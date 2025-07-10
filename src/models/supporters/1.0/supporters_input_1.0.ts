@@ -20,7 +20,7 @@ interface SupportedTeamInput extends SupportersBaseInput {
 
 interface MySupportersInput extends SupportersBaseInput {
   actionType: "mysupporters",
-  userId?: number
+  teamId?: number
 }
 
 export type SupportersInput_1_0 = SupportedTeamInput | MySupportersInput;

@@ -107,8 +107,8 @@ export default class HattrickApiClient implements IHattrickApiClient {
     return response
   }
 
-  getSupporters(config?: { version: "1.0"; actionType: "supportedTeams" } & SupportersConfig): Promise<HattrickDataContainer<SupportedTeamsDataOutput_1_0>>
-  getSupporters(config?: { version: "1.0"; actionType: "mysupporters" } & SupportersConfig): Promise<HattrickDataContainer<MySupportersDataOutput_1_0>>
+  getSupporters(config?: { version: "1.0"; actionType: "supportedTeams", userId?: number } & SupportersConfig): Promise<HattrickDataContainer<SupportedTeamsDataOutput_1_0>>
+  getSupporters(config?: { version: "1.0"; actionType: "mysupporters", teamId?: number } & SupportersConfig): Promise<HattrickDataContainer<MySupportersDataOutput_1_0>>
   async getSupporters(config?: SupportersConfig): Promise<HattrickDataContainer<SupportersOutput>> {
     const input: SupportersInput = {
       file: "supporters",
@@ -175,7 +175,6 @@ export default class HattrickApiClient implements IHattrickApiClient {
 
     if (Array.isArray(parserOptions?.alwaysArray)) {
       x2jOptions.isArray = (name, jpath, isLeafNode, isAttribute) => {
-        console.log(jpath, parserOptions.alwaysArray!.indexOf(jpath) !== -1)
         return parserOptions.alwaysArray!.indexOf(jpath) !== -1;
       }
     }
