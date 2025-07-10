@@ -5,7 +5,7 @@ export const defaultVersion: Version = "1.0";
 
 export const defaultActionType: ActionType = "supportedTeams";
 
-interface SupportersBaseInput {
+export interface SupportersBaseInput {
   file: File,
   version?: Version
   actionType: ActionType
@@ -13,12 +13,12 @@ interface SupportersBaseInput {
   pageSize?: number
 }
 
-interface SupportedTeamInput extends SupportersBaseInput {
+export interface SupportedTeamInput extends SupportersBaseInput {
   actionType: "supportedTeams",
   userId?: number
 }
 
-interface MySupportersInput extends SupportersBaseInput {
+export interface MySupportersInput extends SupportersBaseInput {
   actionType: "mysupporters",
   teamId?: number
 }
