@@ -1023,8 +1023,8 @@
         <td>supporters</td>
         <td>Information about teams supported and teams supporting.</td>
         <td>1.0 (2013-12-16) {default}</td>
-        <td>❌ Not Implemented</td>
-        <td></td>
+        <td>✅​ Done</td>
+        <td>getSupporters()</td>
     </tr>
     <tr>
         <td rowspan="19">teamdetails</td>
