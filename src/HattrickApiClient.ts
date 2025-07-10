@@ -1,7 +1,6 @@
 import { OAuth } from "oauth";
-import { XMLParser } from "fast-xml-parser";
+import { X2jOptions, XMLParser } from "fast-xml-parser";
 import OAuthCheckTokenResponse from "./models/oauth/OAuthCheckTokenResponse";
-import OAuthCheckTokenResponseRaw from "./models/oauth/OAuthCheckTokenResponseRaw";
 import { Scope } from "./models/oauth/Scope";
 import OAuthRequestTokenResponse from "./models/oauth/OAuthRequestTokenResponse";
 import OAuthAccessTokenResponse from "./models/oauth/OAuthAccessTokenResponse";
@@ -11,6 +10,13 @@ import HattrickApiClientConfig from "./interfaces/HattrickApiClientConfig";
 import { defaultVersion, RegionDetailsConfig, RegionDetailsInput, RegionDetailsOutput } from "./models/regionDetails/RegionDetails_1.2";
 import ErrorResponse from "./models/ErrorResponse";
 import HattrickDataContainer from "./models/HattrickDataModel";
+import { defaultActionType } from "./models/supporters/1.0/supporters_input_1.0";
+import { SupportersConfig, SupportersInput, SupportersOutput } from "./models/supporters";
+import { MySupportersDataOutput_1_0, SupportedTeamsDataOutput_1_0 } from "./models/supporters/1.0/supporters_output_1.0";
+
+interface ParserOptions {
+  alwaysArray?: string[];
+}
 
 export default class HattrickApiClient implements IHattrickApiClient {
   private oauth: OAuth;
@@ -25,7 +31,6 @@ export default class HattrickApiClient implements IHattrickApiClient {
   private static readonly checkTokenPath = "https://chpp.hattrick.org/oauth/check_token.ashx"
   private static readonly invalidateTokenPath = "https://chpp.hattrick.org/oauth/invalidate_token.ashx"
   private static readonly protectedPath = "https://chpp.hattrick.org/chppxml.ashx"
-  private readonly parser = new XMLParser({ ignoreDeclaration: true, numberParseOptions: { hex: false, leadingZeros: false, skipLike: new RegExp(/\d+.\d+/) } });
 
   constructor(config: HattrickApiClientConfig) {
     this.oauth_access_token = config.oauth_access_token;
@@ -92,7 +97,7 @@ export default class HattrickApiClient implements IHattrickApiClient {
   }
 
   async getRegionDetails(config?: RegionDetailsConfig): Promise<HattrickDataContainer<RegionDetailsOutput>> {
-    const input : RegionDetailsInput = {
+    const input: RegionDetailsInput = {
       file: "regiondetails",
       version: config?.version || defaultVersion,
       regionID: config?.regionID,
@@ -102,10 +107,29 @@ export default class HattrickApiClient implements IHattrickApiClient {
     return response
   }
 
-  private callAuthenticatedAPI<T>(url: string): Promise<HattrickDataContainer<T>> {
+  getSupporters(config?: { version: "1.0"; actionType: "supportedTeams" } & SupportersConfig): Promise<HattrickDataContainer<SupportedTeamsDataOutput_1_0>>
+  getSupporters(config?: { version: "1.0"; actionType: "mysupporters" } & SupportersConfig): Promise<HattrickDataContainer<MySupportersDataOutput_1_0>>
+  async getSupporters(config?: SupportersConfig): Promise<HattrickDataContainer<SupportersOutput>> {
+    const input: SupportersInput = {
+      file: "supporters",
+      actionType: config?.actionType || defaultActionType,
+      ...config
+    }
+
+    const url: string = `${HattrickApiClient.protectedPath}?${new URLSearchParams(input as any).toString()}`;
+
+    return this.callAuthenticatedAPI<SupportersOutput>(url, {
+      alwaysArray: ["HattrickData.SupportedTeams.SupportedTeam", "HattrickData.MySupporters.SupporterTeam"]
+    });
+  }
+
+  private callAuthenticatedAPI<T>(url: string, parserOptions?: ParserOptions): Promise<HattrickDataContainer<T>> {
     if (!this.oauth_access_token || !this.oauth_access_token_secret) {
       return Promise.reject(new Error("OAuth access token and secret are required to check the token."));
     }
+
+    const parser = new XMLParser(HattrickApiClient.buildXmlParserOptions(parserOptions));
+
     return new Promise((resolve, reject) => {
       this.oauth.get(
         url,
@@ -115,7 +139,8 @@ export default class HattrickApiClient implements IHattrickApiClient {
           if (err) {
             return reject(err);
           }
-          const parsedData = this.parser.parse(data as string);
+
+          const parsedData = parser.parse(data as string);
 
           if ((parsedData as ErrorResponse).HattrickData.Error) {
             return reject((parsedData as ErrorResponse));
@@ -133,6 +158,29 @@ export default class HattrickApiClient implements IHattrickApiClient {
         }
       );
     });
+  }
+
+  private static buildXmlParserOptions(parserOptions?: ParserOptions): X2jOptions {
+    const x2jOptions: X2jOptions = {
+      ignoreDeclaration: true,
+      ignoreAttributes: false,
+      attributeNamePrefix: "",
+      parseAttributeValue: true,
+      numberParseOptions: {
+        hex: false,
+        leadingZeros: false,
+        skipLike: new RegExp(/\d+.\d+/)
+      }
+    }
+
+    if (Array.isArray(parserOptions?.alwaysArray)) {
+      x2jOptions.isArray = (name, jpath, isLeafNode, isAttribute) => {
+        console.log(jpath, parserOptions.alwaysArray!.indexOf(jpath) !== -1)
+        return parserOptions.alwaysArray!.indexOf(jpath) !== -1;
+      }
+    }
+
+    return x2jOptions;
   }
 
 }
