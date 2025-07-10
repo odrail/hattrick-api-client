@@ -977,7 +977,7 @@
         <td></td>
     </tr>
     <tr>
-        <td><a href="https://www84.hattrick.org/Community/CHPP/NewDocs/File.aspx?name=regiondetails">regiondetails</a></td>
+        <td><a href="https://www.hattrick.org/Community/CHPP/NewDocs/File.aspx?name=regiondetails">regiondetails</a></td>
         <td>Detailed information about a region</td>
         <td>1.2 {default}</td>
         <td>✅​ Done</td>
@@ -1020,11 +1020,11 @@
         <td></td>
     </tr>
     <tr>
-        <td>supporters</td>
+        <td>><a href="https://www.hattrick.org/Community/CHPP/NewDocs/File.aspx?name=supporters">supporters</a></td>
         <td>Information about teams supported and teams supporting.</td>
         <td>1.0 (2013-12-16) {default}</td>
-        <td>✅​ Done</td>
-        <td>getSupporters()</td>
+        <td>❌ Not Implemented</td>
+        <td></td>
     </tr>
     <tr>
         <td rowspan="19">teamdetails</td>
